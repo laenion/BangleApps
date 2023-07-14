@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <title>Create waypoints for Offline Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.css" rel="stylesheet"></link>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" rel="stylesheet"></link>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.css" rel="stylesheet"></link>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="../../core/lib/interface.js"></script>
+  </head>
+  <body>
+    <div id="map" style="height: 70%"></div>
+    <p>
+      <script>
+        var toUpload;
+        var map = L.map('map');
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        L.Routing.control({
+          geocoder: L.Control.Geocoder.nominatim(),
+          router: L.Routing.osrmv1({
+            serviceUrl: 'https://routing.openstreetmap.de/routed-bike/route/v1'
+          })
+        }).on('routesfound', function(e) {
+          // Only store the minimal required data - the complete JSON exceeds the watch's
+          // storge for longer routes.
+          toUpload = [];
+          console.log(e.routes);
+          for (var i=0; i<e.routes[0].instructions.length; i++) {
+            toUpload[i] = {};
+            toUpload[i]["text"] = e.routes[0].instructions[i].text;
+            switch(e.routes[0].instructions[i].modifier) {
+              case "Straight":
+                toUpload[i]["direction"] = 0;
+                break;
+              case "SlightRight":
+                toUpload[i]["direction"] = 45;
+                break;
+              case "Right":
+                toUpload[i]["direction"] = 90;
+                break;
+              case "SharpRight":
+                toUpload[i]["direction"] = 135;
+                break;
+              case "TurnAround":
+                toUpload[i]["direction"] = 180;
+                break;
+              case "SharpLeft":
+                toUpload[i]["direction"] = 225;
+                break;
+              case "Left":
+                toUpload[i]["direction"] = 270;
+                break;
+              case "SlightLeft":
+                toUpload[i]["direction"] = 315;
+                break;
+              default:
+                toUpload[i]["direction"] = undefined;
+            }
+            toUpload[i]["x"] = e.routes[0].coordinates[e.routes[0].instructions[i].index].lat;
+            toUpload[i]["y"] = e.routes[0].coordinates[e.routes[0].instructions[i].index].lng;
+          }
+          //alert('Found ' + e.routes.length + ' route(s).');
+          console.log(toUpload);
+          document.getElementById('upload').disabled = false;
+        }).addTo(map);
+      </script>
+    </p>
+    <p>
+      <input type="button" id="upload" name="upload" value="Upload" disabled>
+      <div id="status"></div>
+      <div id="map"></div>
+
+    <script type="module">
+
+let status = document.getElementById("status");
+
+document
+  .getElementById("upload")
+  .addEventListener('click', function() {
+    document.getElementById('upload').disabled = true;
+    status.innerHTML = "Uploading route";
+    let gpc_string = JSON.stringify(toUpload);
+            status.innerHTML = gpc_string;
+    Util.writeStorage("route.json", gpc_string, () => {
+      status.innerHTML = "Checking upload";
+      Util.readStorage("route.json", uploaded_content => {
+        if (uploaded_content == gpc_string) {
+            status.innerHTML = `route.json uploaded`;
+        } else {
+            status.innerHTML = "Upload FAILED";
+            document.getElementById('upload').disabled = false;
+        }
+      });
+    });
+});
+
+    </script>
+  </body>
+</html>
