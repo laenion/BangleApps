@@ -1,0 +1,18 @@
+{
+  "id": "routing",
+  "name": "Routing",
+  "shortName": "Routing",
+  "version": "0.5",
+  "description": "Offline GPS navigation system, showing the directions for an uploaded route.",
+  "allow_emulator":true,
+  "icon": "routing.png",
+  "type": "app",
+  "tags": "tool,outdoors,gps,routing",
+  "supports": ["BANGLEJS2"],
+  "readme": "README.md",
+  "interface": "interface.html",
+  "storage": [
+    {"name":"routing.app.js","url":"routing.js"},
+    {"name":"routing.img","url":"app-icon.js","evaluate":true}
+  ]
+}

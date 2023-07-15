@@ -10,6 +10,14 @@
     <script src="../../core/lib/interface.js"></script>
   </head>
   <body>
+    <div>
+      <input type="radio" name="transportation" id="car" value="car" checked>
+      <label for="car">Car</label>
+      <input type="radio" name="transportation" id="bike" value="bike">
+      <label for="bike">Bike</label>
+      <input type="radio" name="transportation" id="foot" value="foot">
+      <label for="foot">Foot</label>
+    </div>
     <div id="map" style="height: 70%"></div>
     <p>
       <script>
@@ -21,7 +29,7 @@
         L.Routing.control({
           geocoder: L.Control.Geocoder.nominatim(),
           router: L.Routing.osrmv1({
-            serviceUrl: 'https://routing.openstreetmap.de/routed-bike/route/v1'
+            serviceUrl: 'https://routing.openstreetmap.de/routed-foot/route/v1'
           })
         }).on('routesfound', function(e) {
           // Only store the minimal required data - the complete JSON exceeds the watch's
@@ -83,7 +91,7 @@ document
     document.getElementById('upload').disabled = true;
     status.innerHTML = "Uploading route";
     let gpc_string = JSON.stringify(toUpload);
-            status.innerHTML = gpc_string;
+    status.innerHTML = gpc_string;
     Util.writeStorage("route.json", gpc_string, () => {
       status.innerHTML = "Checking upload";
       Util.readStorage("route.json", uploaded_content => {
