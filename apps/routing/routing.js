@@ -44,7 +44,7 @@ Bangle.on('GPS', function(gps) {
     var diststring = Math.round(distance[closest]).toString();
     if (diststring.length > 3)
       diststring = diststring.slice(0, -3) + "." + diststring.slice(-3);
-    g.drawString(route[closest].text
+    g.drawString(g.wrapString(route[closest].text, g.getWidth()).join("\n")
       + "\nin " + diststring + "m\n"
       + gps.time.getHours().toString().padStart(2, "0") + ":" + gps.time.getMinutes().toString().padStart(2, "0"), 0, (h/2)+30);
     if (distance[closest] < 50*((gps.speed/10)+1) && prevBuzz != closest) {
