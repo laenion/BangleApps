@@ -80,6 +80,7 @@
         for (var i = 0; i < transportationButtons.length; i++) {
           transportationButtons[i].addEventListener('change', (event) => {
             control.getRouter().options.serviceUrl = "https://routing.openstreetmap.de/routed-" + event.srcElement.value + "/route/v1";
+            control.route();
           });
         }
       </script>
