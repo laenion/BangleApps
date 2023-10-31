@@ -13,10 +13,9 @@ Bangle.on('GPS', function(gps) {
     var closest;
     var distance = [];
     for (var point = 0; point < route.length; point++) {
-      var dLat = route[point].x - gps.lat;
-      var dLon = route[point].y - gps.lon;
-      var a = Math.pow(Math.sin(dLat / 2.0), 2) + Math.pow(Math.sin(dLon / 2.0), 2) * Math.cos(gps.lat) * Math.cos(route[point].x);
-      distance[point] = 6378.388 * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a))
+      var projg = Bangle.project({lat: gps.lat, lon: gps.lon});
+      var projm = Bangle.project({lat: route[point].x, lon: route[point].y});
+      distance[point] = Math.sqrt(Math.pow(projg.x - projm.x, 2) + Math.pow(projg.y - projm.y, 2));
       if (distance[point] < minDistance) {
         minDistance = distance[point];
         closest = point;
